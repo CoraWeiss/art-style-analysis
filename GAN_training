@@ -1,0 +1,72 @@
+import React, { useState } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
+const TrainingVisualizer = () => {
+  // Sample data - we'll replace this with real data
+  const [data, setData] = useState([
+    { epoch: 0, dLoss: 1.3924, gLoss: 3.6222 },
+    { epoch: 1, dLoss: 0.4899, gLoss: 10.7886 }
+  ]);
+
+  return (
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-4">GAN Training Progress</h2>
+      
+      <div className="h-96 w-full">
+        <ResponsiveContainer>
+          <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="epoch" label={{ value: 'Epoch', position: 'bottom' }} />
+            <YAxis label={{ value: 'Loss Value', angle: -90, position: 'insideLeft' }} />
+            <Tooltip />
+            <Legend />
+            <Line 
+              type="monotone" 
+              dataKey="dLoss" 
+              stroke="#8884d8" 
+              name="Discriminator Loss"
+            />
+            <Line 
+              type="monotone" 
+              dataKey="gLoss" 
+              stroke="#82ca9d" 
+              name="Generator Loss"
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="mt-8">
+        <h3 className="text-xl font-bold mb-2">Understanding the Graph:</h3>
+        <ul className="list-disc pl-5">
+          <li className="mb-2">
+            <span className="font-semibold text-purple-600">Discriminator Loss (Purple):</span>
+            <br />
+            Ideally stays around 0.5-0.7. Shows how well it can spot real vs. fake art.
+          </li>
+          <li className="mb-2">
+            <span className="font-semibold text-green-600">Generator Loss (Green):</span>
+            <br />
+            Should gradually decrease. Shows how well it's learning to create convincing art.
+          </li>
+        </ul>
+      </div>
+
+      <div className="mt-8">
+        <h3 className="text-xl font-bold mb-2">Current Status:</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-4 bg-purple-100 rounded">
+            <p className="font-bold">Latest Discriminator Loss:</p>
+            <p className="text-2xl">{data[data.length - 1].dLoss.toFixed(4)}</p>
+          </div>
+          <div className="p-4 bg-green-100 rounded">
+            <p className="font-bold">Latest Generator Loss:</p>
+            <p className="text-2xl">{data[data.length - 1].gLoss.toFixed(4)}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default TrainingVisualizer;
