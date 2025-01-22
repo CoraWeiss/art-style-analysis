@@ -1,0 +1,61 @@
+import instaloader
+import os
+from pathlib import Path
+
+def download_profile_posts(profile_name):
+    """Download all posts from an Instagram profile"""
+    print(f"Starting download from {profile_name}")
+    
+    # Initialize instaloader
+    L = instaloader.Instaloader(
+        download_pictures=True,
+        download_videos=False,
+        download_video_thumbnails=False,
+        download_geotags=False,
+        download_comments=False,
+        save_metadata=False,
+        dirname_pattern="{profile}"
+    )
+    
+    try:
+        # Get profile
+        profile = instaloader.Profile.from_username(L.context, profile_name)
+        print(f"Found profile: {profile.username}")
+        print(f"Total posts to download: {profile.mediacount}")
+        
+        # Create directory for downloads
+        if not os.path.exists(profile_name):
+            os.makedirs(profile_name)
+        
+        # Download posts
+        count = 0
+        print(f"\nStarting to download all posts...")
+        for post in profile.get_posts():
+            if not post.is_video:  # Skip videos
+                print(f"Downloading post {count + 1}/{profile.mediacount}")
+                try:
+                    L.download_post(post, target=profile_name)
+                    count += 1
+                except Exception as e:
+                    print(f"Error downloading post: {str(e)}")
+                    continue
+        
+        # Verify downloads
+        downloaded_files = list(Path(profile_name).glob("*.jpg"))
+        print(f"\nSuccessfully downloaded {len(downloaded_files)} images to folder: {profile_name}")
+        
+        return True
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return False
+
+if __name__ == "__main__":
+    print("Starting program...")
+    profile_name = "christmasfreud"
+    print(f"Attempting to access profile: {profile_name}")
+    success = download_profile_posts(profile_name)
+    if success:
+        print("Profile accessed successfully!")
+        print(f"You can find the downloaded images in the '{profile_name}' folder")
+    else:
+        print("Failed to access profile")
